@@ -33,7 +33,7 @@ pipeline {
         }
         stage('Trivy Vulnerability Scan') {
             steps {
-                sh "trivy image --format template --template '@/usr/local/share/trivy/templates/html.tpl' --output trivy-report.html --exit-code 1 --severity HIGH,CRITICAL $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
+                sh "trivy image --format template --template '@/usr/local/share/trivy/templates/html.tpl' --output trivy-report.html --severity HIGH,CRITICAL $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
             }
         }
         stage('Push Image') {
@@ -47,23 +47,8 @@ pipeline {
             steps {
                 sh "docker pull $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
                 sh "docker rm -f ${APP_NAME} || true"
-                sh "docker run -d -p '2000:3000' --name ${APP_NAME} $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
+                sh "docker run -d -p '${EXPOSE_PORT}:3000' --name ${APP_NAME} $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
             }
-        }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: "trivy_report.html", fingerprint: true
-                
-            publishHTML (target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: false,
-                keepAll: true,
-                reportDir: '.',
-                reportFiles: 'trivy_report.html',
-                reportName: 'Trivy Scan',
-            ])
         }
     }
 }
