@@ -33,8 +33,7 @@ pipeline {
         }
         stage('Trivy Vulnerability Scan') {
             steps {
-                sh "trivy image --format template --template '@/usr/local/share/trivy/templates/html.tpl' --output trivy-report.html --severity HIGH,CRITICAL ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${env.APP_NAME}"
-                archiveArtifacts artifacts: 'trivy-report.html'        
+                sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${env.APP_NAME}"    
             }
         }
         stage('Push Image') {
