@@ -9,9 +9,6 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                sh "ls /opt"
-                sh "ls /opt/sonar-scanner"
-                sh "ls /opt/sonar-scanner/bin"
                 withSonarQubeEnv('sonarqube') {
                     sh "/opt/sonar-scanner/bin/sonar-scanner \
                     -Dsonar.projectKey=my-node-app \
@@ -26,6 +23,11 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'docker build . -t $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/my-node-app'
+            }
+        }
+        stage('Trivy Vulnerability Scan') {
+            steps {
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/my-node-app'
             }
         }
         stage('Push Image') {
