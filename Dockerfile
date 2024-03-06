@@ -10,7 +10,7 @@ USER node
 
 RUN npm install --ignore-scripts
 
-COPY --chown=node:node . .
+COPY --chown=node:node --chmod=644 bin public routes app.js ./
 
 RUN npm start
 
