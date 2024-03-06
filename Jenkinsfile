@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment { 
-        APP_NAME = 'my-node-app'
-        EXPOSE_PORT = 2222
+        env.APP_NAME = 'my-node-app'
+        EXPOSE_PORT = 2000
     }
     
     stages {
@@ -16,7 +16,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('sonarqube') {
                     sh "/opt/sonar-scanner/bin/sonar-scanner \
-                    -Dsonar.projectKey=${APP_NAME} \
+                    -Dsonar.projectKey=${env.APP_NAME} \
                     -Dsonar.sources=. \
                     -Dsonar.exclusions=trivy-report.html \
                     -Dsonar.host.url=${env.SONAR_HOST_URL} \
@@ -28,26 +28,27 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh "docker build . -t $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
+                sh "docker build . -t $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
             }
         }
         stage('Trivy Vulnerability Scan') {
             steps {
-                sh "trivy image --format template --template '@/usr/local/share/trivy/templates/html.tpl' --output trivy-report.html --severity HIGH,CRITICAL $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
+                sh "trivy image --format template --template '@/usr/local/share/trivy/templates/html.tpl' --output trivy-report.html --severity HIGH,CRITICAL $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
+                archiveArtifacts artifacts: 'trivy-report.html'        
             }
         }
         stage('Push Image') {
             steps {
                 sh 'aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com'
-                sh "aws ecr describe-repositories --repository-names ${APP_NAME} || aws ecr create-repository --repository-name ${APP_NAME}"
-                sh "docker push $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
+                sh "aws ecr describe-repositories --repository-names ${env.APP_NAME} || aws ecr create-repository --repository-name ${env.APP_NAME}"
+                sh "docker push $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
             }
         }
         stage('Deploy') {
             steps {
-                sh "docker pull $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
-                sh "docker rm -f ${APP_NAME} || true"
-                sh "docker run -d -p '${EXPOSE_PORT}:3000' --name ${APP_NAME} $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${APP_NAME}"
+                sh "docker pull $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
+                sh "docker rm -f ${env.APP_NAME} || true"
+                sh "docker run -d -p '${env.EXPOSE_PORT}:3000' --name ${env.APP_NAME} $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
             }
         }
     }
