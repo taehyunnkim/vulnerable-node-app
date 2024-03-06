@@ -4,7 +4,6 @@ pipeline {
     environment { 
         APP_NAME = 'my-node-app'
         EXPOSE_PORT = 2222
-
     }
     
     stages {
@@ -64,8 +63,7 @@ pipeline {
                 reportDir: '.',
                 reportFiles: 'trivy_report.html',
                 reportName: 'Trivy Scan',
-                ])
-            }
+            ])
         }
     }
 }
