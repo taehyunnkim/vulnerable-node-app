@@ -1,8 +1,33 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(251, 253, 255);
 }
 
-a {
-  color: #00B7FF;
+.container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 800px;
+  height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.navHeader {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+p {
+  margin: 0;
 }
