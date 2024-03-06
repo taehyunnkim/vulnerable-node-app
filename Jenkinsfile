@@ -13,6 +13,7 @@ pipeline {
                     sh "/opt/sonar-scanner/bin/sonar-scanner \
                     -Dsonar.projectKey=my-node-app \
                     -Dsonar.sources=. \
+                    -Dsonar.exclusions=trivy-report.html \
                     -Dsonar.host.url=${env.SONAR_HOST_URL} \
                     -Dsonar.login=${env.SONAR_AUTH_TOKEN} \
                     -Dsonar.qualitygate.wait=true \
