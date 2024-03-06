@@ -6,7 +6,10 @@ COPY package.json package-lock.json ./
 
 RUN npm install --ignore-scripts
 
-COPY bin public routes app.js ./
+COPY bin ./
+COPY public ./
+COPY routes ./
+COPY app.js  ./
 
 USER node
 
