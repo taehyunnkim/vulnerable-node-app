@@ -13,6 +13,6 @@ COPY app.js  ./
 
 USER node
 
-RUN npm start
+CMD ["npm", "start"]
 
 EXPOSE 3000
