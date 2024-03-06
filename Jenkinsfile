@@ -33,7 +33,7 @@ pipeline {
         }
         stage('Trivy Vulnerability Scan') {
             steps {
-                sh "trivy image --format template --template '@/usr/local/share/trivy/templates/html.tpl' --output trivy-report.html --severity HIGH,CRITICAL $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
+                sh "trivy image --format template --template '@/usr/local/share/trivy/templates/html.tpl' --output trivy-report.html --severity HIGH,CRITICAL ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${env.APP_NAME}"
                 archiveArtifacts artifacts: 'trivy-report.html'        
             }
         }
@@ -41,14 +41,14 @@ pipeline {
             steps {
                 sh 'aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com'
                 sh "aws ecr describe-repositories --repository-names ${env.APP_NAME} || aws ecr create-repository --repository-name ${env.APP_NAME}"
-                sh "docker push $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
+                sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${env.APP_NAME}"
             }
         }
         stage('Deploy') {
             steps {
-                sh "docker pull $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
+                sh "docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${env.APP_NAME}"
                 sh "docker rm -f ${env.APP_NAME} || true"
-                sh "docker run -d -p '${env.EXPOSE_PORT}:3000' --name ${env.APP_NAME} $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
+                sh "docker run -d -p '${env.EXPOSE_PORT}:3000' --name ${env.APP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${env.APP_NAME}"
             }
         }
     }
