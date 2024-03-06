@@ -33,7 +33,7 @@ pipeline {
         }
         stage('Trivy Vulnerability Scan') {
             steps {
-                sh "trivy image --exit-code 1 --format json --severity HIGH,CRITICAL ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${env.APP_NAME}"    
+                sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${env.APP_NAME}"    
             }
         }
         stage('Push Image') {
