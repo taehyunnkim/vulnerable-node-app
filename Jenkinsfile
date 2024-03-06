@@ -28,8 +28,10 @@ pipeline {
         }
         stage('Build') {
             steps {
-                def imageName = "$AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
-                sh "docker build . -t ${imageName}"
+                script {
+                    def imageName = "$AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/${env.APP_NAME}"
+                    sh "docker build . -t ${imageName}"
+                }
             }
         }
         stage('Trivy Vulnerability Scan') {
